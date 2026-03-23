@@ -33,6 +33,8 @@ import { Eg12_2 } from './eg12_2';
 import { Eg20_1 } from './eg20_1';
 import { Eg20_2 } from './eg20_2';
 import { Eg30 } from './eg30';
+import { Eg22_2 } from './eg22_2';
+import { Eg31 } from './eg31';
 
 export const routes: Routes = [
   {
@@ -140,6 +142,10 @@ export const routes: Routes = [
     component: Eg22,
   },
   {
+    path: 'eg22_2',
+    component: Eg22_2,
+  },
+  {
     path: 'eg23',
     component: Eg23,
   },
@@ -170,5 +176,9 @@ export const routes: Routes = [
   {
     path: 'eg30',
     component: Eg30,
+  },
+  {
+    path: 'eg31',
+    component: Eg31,
   },
 ];
