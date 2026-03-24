@@ -5,7 +5,7 @@ import { Component, signal } from '@angular/core';
   imports: [],
   template: `
     <h2>Example 1</h2>
-    <p style="color: #777">signal.set - updates value</p>
+    <p style="color: #777">signal.set - set value</p>
 
     My name is {{ fullName() }}<br /><br />
     <button (click)="changeName()">Change Name</button>

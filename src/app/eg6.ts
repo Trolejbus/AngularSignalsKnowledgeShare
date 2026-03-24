@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -8,17 +8,17 @@ import { BehaviorSubject } from 'rxjs';
   template: `
     <h2>Example 6</h2>
     <p style="color: #777">
-      computed - Is lazy evaluated, which means it will be called only if used
+      computed - Combining multiple signals - trigger computed only for used signal
     </p>
 
-    @if (showCharacter()) {
-      {{ character() }}<br /><br />
-    }
+    Character: {{ character() }}<br /><br />
 
+    <button (click)="toggleName()" style="margin-right: 10px">Toggle Name</button>
     <button (click)="makeOlder()" style="margin-right: 10px">Make Older</button>
-    <button (click)="toggleCharacter()">
-      {{ showCharacter() ? 'Hide character' : 'Show character' }}
+    <button (click)="toggleDisplayAge()" style="margin-right: 10px">
+      {{ displayAge() ? 'Hide age' : 'Show age' }}
     </button>
+
     <br />
     <br />
     <hr />
@@ -27,28 +27,31 @@ import { BehaviorSubject } from 'rxjs';
   `,
 })
 export class Eg6 {
-  private cd = inject(ChangeDetectorRef);
+  displayAge = signal(true);
 
+  fullName = signal('Bond');
+  age = signal(36);
   computedTriggered$ = new BehaviorSubject(0);
 
-  showCharacter = signal(false);
-  fullName = signal('Bond');
-  age = signal(35);
-
   character = computed(() => {
+    let result = this.fullName();
+    if (this.displayAge()) {
+      result += ` (${this.age()})`;
+    }
+
     this.computedTriggered$.next(this.computedTriggered$.value + 1);
-    return `My name is ${this.fullName()} (${this.age()})`;
+    return result;
   });
+
+  toggleName(): void {
+    this.fullName.set(this.fullName() === 'Bond' ? 'James Bond' : 'Bond');
+  }
 
   makeOlder(): void {
     this.age.update((x) => x + 1);
   }
 
-  toggleCharacter(): void {
-    this.showCharacter.update((x) => !x);
-  }
-
-  update(): void {
-    this.cd.detectChanges();
+  toggleDisplayAge(): void {
+    this.displayAge.update((x) => !x);
   }
 }

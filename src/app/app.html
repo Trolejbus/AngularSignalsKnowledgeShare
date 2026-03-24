@@ -5,57 +5,58 @@
     <h4 style="padding-left: 10px">signal</h4>
     <ul>
       <li><a [routerLink]="['eg1']">Eg 1 - signal.set</a></li>
-      <li><a [routerLink]="['eg2']">Eg 2 - signal.update</a></li>
-      <li><a [routerLink]="['eg2-2']">Eg 2.2 - signal.asReadonly</a></li>
+      <li><a [routerLink]="['eg2']">Eg 2 - signal.asReadonly</a></li>
+      <li><a [routerLink]="['eg3']">Eg 3 - signal.update</a></li>
     </ul>
     <hr />
     <h4 style="padding-left: 10px">computed</h4>
     <ul>
-      <li><a [routerLink]="['eg3']">Eg 3 - computed</a></li>
-      <li><a [routerLink]="['eg4']">Eg 4 - computed - mutation</a></li>
-      <li><a [routerLink]="['eg5']">Eg 5 - computed - when it's triggered</a></li>
-      <li><a [routerLink]="['eg6']">Eg 6 - computed - lazy evaulation</a></li>
-      <li><a [routerLink]="['eg7']">Eg 7 - computed - memoization reusing</a></li>
-      <li><a [routerLink]="['eg8']">Eg 8 - computed - memoization on no change</a></li>
-      <li><a [routerLink]="['eg9']">Eg 9 - computed - batching changes</a></li>
-      <li><a [routerLink]="['eg10']">Eg 10 - computed - uses last value in batch</a></li>
-      <li><a [routerLink]="['eg11']">Eg 11 - computed - untracked</a></li>
-      <li><a [routerLink]="['eg12']">Eg 12 - computed - equal</a></li>
-      <li><a [routerLink]="['eg12_2']">Eg 12.2 - computed - peek</a></li>
+      <li><a [routerLink]="['eg4']">Eg 4 - computed</a></li>
+      <li><a [routerLink]="['eg5']">Eg 5 - computed - mutation</a></li>
+      <li><a [routerLink]="['eg6']">Eg 6 - computed - when it's triggered</a></li>
+      <li><a [routerLink]="['eg7']">Eg 7 - computed - lazy evaulation</a></li>
+      <li><a [routerLink]="['eg8']">Eg 8 - computed - memoization reusing</a></li>
+      <li><a [routerLink]="['eg9']">Eg 9 - computed - memoization on no change</a></li>
+      <li><a [routerLink]="['eg10']">Eg 10 - computed - batching changes</a></li>
+      <li><a [routerLink]="['eg10_1']">Eg 10.1 - computed - dependency graph (devtools)</a></li>
+      <li><a [routerLink]="['eg11']">Eg 11 - computed - uses last value in batch</a></li>
+      <li><a [routerLink]="['eg12']">Eg 12 - computed - untracked</a></li>
+      <li><a [routerLink]="['eg13']">Eg 13 - computed - equal</a></li>
+      <li><a [routerLink]="['eg14']">Eg 14 - computed - peek</a></li>
     </ul>
     <hr />
     <h4 style="padding-left: 10px">effect</h4>
     <ul>
-      <li><a [routerLink]="['eg13']">Eg 13 - effect</a></li>
-      <li><a [routerLink]="['eg14']">Eg 14 - effect - batching changes</a></li>
-      <li><a [routerLink]="['eg15']">Eg 15 - effect - setting signal in effect</a></li>
-      <li><a [routerLink]="['eg16']">Eg 16 - effect - example</a></li>
-      <li><a [routerLink]="['eg17']">Eg 17 - effect - creating effect</a></li>
-      <li><a [routerLink]="['eg18']">Eg 18 - effect - cleanup</a></li>
+      <li><a [routerLink]="['eg15']">Eg 15 - effect</a></li>
+      <li><a [routerLink]="['eg16']">Eg 16 - effect - batching changes</a></li>
+      <li><a [routerLink]="['eg17']">Eg 17 - effect - setting signal in effect</a></li>
+      <li><a [routerLink]="['eg18']">Eg 18 - effect - example</a></li>
+      <li><a [routerLink]="['eg19']">Eg 19 - effect - creating effect</a></li>
+      <li><a [routerLink]="['eg20']">Eg 20 - effect - cleanup</a></li>
     </ul>
     <hr />
     <h4 style="padding-left: 10px">Change Detection</h4>
     <ul>
-      <li><a [routerLink]="['eg19']">Eg 19 - rxjs vs signals</a></li>
-      <li><a [routerLink]="['eg20']">Eg 20 - change detection</a></li>
+      <li><a [routerLink]="['eg21']">Eg 21 - rxjs vs signals calculation</a></li>
+      <li><a [routerLink]="['eg22']">Eg 22 - rxjs vs signals change detection</a></li>
+      <li><a [routerLink]="['eg23']">Eg 23 - change detection</a></li>
     </ul>
     <hr />
     <h4 style="padding-left: 10px">Other</h4>
     <ul>
-      <li><a [routerLink]="['eg20_1']">Eg 20.1 - toObservable</a></li>
-      <li><a [routerLink]="['eg20_2']">Eg 20.2 - toSignal</a></li>
-      <li><a [routerLink]="['eg21']">Eg 21 - input</a></li>
-      <li><a [routerLink]="['eg22']">Eg 22 - output</a></li>
-      <li><a [routerLink]="['eg22_2']">Eg 22.2 - contentChild, viewChild etc</a></li>
-      <li><a [routerLink]="['eg23']">Eg 23 - model</a></li>
-      <li><a [routerLink]="['eg24']">Eg 24 - linkedSignal</a></li>
-      <li><a [routerLink]="['eg25']">Eg 25 - resource</a></li>
-      <li><a [routerLink]="['eg26']">Eg 26 - rxResource</a></li>
-      <li><a [routerLink]="['eg27']">Eg 27 - httpResource</a></li>
-      <li><a [routerLink]="['eg28']">Eg 28 - ngrx signal store</a></li>
-      <li><a [routerLink]="['eg29']">Eg 29 - ngrx signal store (class)</a></li>
-      <li><a [routerLink]="['eg30']">Eg 30 - signal forms</a></li>
-      <li><a [routerLink]="['eg31']">Eg 31 - devtools</a></li>
+      <li><a [routerLink]="['eg24']">Eg 24 - toObservable</a></li>
+      <li><a [routerLink]="['eg25']">Eg 25 - toSignal</a></li>
+      <li><a [routerLink]="['eg26']">Eg 26 - input</a></li>
+      <li><a [routerLink]="['eg27']">Eg 27 - output</a></li>
+      <li><a [routerLink]="['eg28']">Eg 28 - contentChild, viewChild etc</a></li>
+      <li><a [routerLink]="['eg29']">Eg 29 - model</a></li>
+      <li><a [routerLink]="['eg30']">Eg 30 - linkedSignal</a></li>
+      <li><a [routerLink]="['eg21']">Eg 31 - resource</a></li>
+      <li><a [routerLink]="['eg32']">Eg 32 - rxResource</a></li>
+      <li><a [routerLink]="['eg33']">Eg 33 - httpResource</a></li>
+      <li><a [routerLink]="['eg34']">Eg 34 - ngrx signal store</a></li>
+      <li><a [routerLink]="['eg35']">Eg 35 - ngrx signal store (class)</a></li>
+      <li><a [routerLink]="['eg36']">Eg 36 - signal forms</a></li>
     </ul>
   </div>
   <div style="padding: 20px">

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { CharacterView } from './eg21';
+import { CharacterView } from './eg26';
 import { SIGNAL } from '@angular/core/primitives/signals';
 import { InputSignal } from '@angular/core';
 

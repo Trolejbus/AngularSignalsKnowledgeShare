@@ -1,22 +1,26 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
-  selector: 'app-eg3',
+  selector: 'app-Eg3',
   imports: [],
   template: `
-    <h2>Example 3</h2>
-    <p style="color: #777">computed - computes values based on other signals</p>
+    <h3>Example 3</h3>
+    <p style="color: #777">signal.update - updates signal based on current value (cannot mutate)</p>
 
-    {{ characterName() }}<br /><br />
-    <button (click)="changeName()">Change Name</button>
+    My name is {{ character().name }}<br /><br />
+    <button (click)="changeName()">Change name</button>
   `,
 })
 export class Eg3 {
-  fullName = signal('Bond');
-
-  characterName = computed(() => `My name is ${this.fullName()}`);
+  character = signal({
+    name: 'Bond',
+    age: 35,
+  });
 
   changeName(): void {
-    this.fullName.set('James Bond');
+    this.character.update((x) => ({
+      ...x,
+      name: 'James Bond',
+    }));
   }
 }

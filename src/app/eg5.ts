@@ -1,57 +1,29 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-eg5',
-  imports: [AsyncPipe],
+  imports: [],
   template: `
     <h2>Example 5</h2>
-    <p style="color: #777">
-      computed - Combining multiple signals - trigger computed only for used signal
-    </p>
+    <p style="color: #777">computed - Problems with mutation</p>
 
-    Character: {{ character() }}<br /><br />
-
-    <button (click)="toggleName()" style="margin-right: 10px">Toggle Name</button>
-    <button (click)="makeOlder()" style="margin-right: 10px">Make Older</button>
-    <button (click)="toggleDisplayAge()" style="margin-right: 10px">
-      {{ displayAge() ? 'Hide age' : 'Show age' }}
-    </button>
-
-    <br />
-    <br />
-    <hr />
-    <br />
-    Computed triggered times: {{ computedTriggered$ | async }}
+    My name is {{ character().name }}<br /><br />
+    {{ characterName() }}<br /><br />
+    <button (click)="changeName()">Change name (mutate)</button>
   `,
 })
 export class Eg5 {
-  displayAge = signal(true);
-
-  fullName = signal('Bond');
-  age = signal(35);
-  computedTriggered$ = new BehaviorSubject(0);
-
-  character = computed(() => {
-    let result = this.fullName();
-    if (this.displayAge()) {
-      result += ` (${this.age()})`;
-    }
-
-    this.computedTriggered$.next(this.computedTriggered$.value + 1);
-    return result;
+  character = signal({
+    name: 'Bond',
+    age: 35,
   });
 
-  toggleName(): void {
-    this.fullName.set(this.fullName() === 'Bond' ? 'James Bond' : 'Bond');
-  }
+  characterName = computed(() => `My name is ${this.character().name}`);
 
-  makeOlder(): void {
-    this.age.update((x) => x + 1);
-  }
-
-  toggleDisplayAge(): void {
-    this.displayAge.update((x) => !x);
+  changeName(): void {
+    this.character.update((x) => {
+      x.name = 'James Bond';
+      return x;
+    });
   }
 }

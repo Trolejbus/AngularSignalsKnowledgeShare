@@ -1,51 +1,71 @@
-import { JsonPipe } from '@angular/common';
-import { httpResource } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  contentChild,
+  contentChildren,
+  signal,
+  viewChild,
+  viewChildren,
+} from '@angular/core';
 
-// https://medium.com/@giorgio.galassi/angular-v19-understanding-the-new-resource-and-rxresource-apis-8a387c7d9351
-// https://www.angulararchitects.io/blog/using-the-resource-api-with-the-ngrx-signal-store/
+@Component({
+  selector: 'app-eg27_child',
+  template: `
+    <div #v1>ViewChild</div>
+    @for (i of viewChildrens(); track $index) {
+      <div #v2>ViewChildren</div>
+    }
+
+    <br /><br />
+    <button (click)="addViewChildren()">Add View Children</button>
+
+    <br />
+    <hr />
+
+    <br /><br />
+    {{ vChild() != null ? 'there is view child' : 'no view child' }}<br />
+    View Children count: {{ vChildren().length }}<br />
+    {{ cChild() != null ? 'there is content child' : 'no content child' }}<br />
+    Content Children count: {{ cChildren().length }}<br />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class Eg27_Child {
+  viewChildrens = signal<number[]>([]);
+
+  vChild = viewChild('v1');
+  vChildren = viewChildren('v2');
+  cChild = contentChild('c1');
+  cChildren = contentChildren('c2');
+
+  addViewChildren(): void {
+    this.viewChildrens.update((x) => [...x, 1]);
+  }
+}
 
 @Component({
   selector: 'app-eg27',
-  imports: [JsonPipe],
+  imports: [Eg27_Child],
   template: `
     <h2>Example 27</h2>
-    <p style="color: #777">httpResource</p>
+    <p style="color: #777">viewChild, contentChild, viewChildren, contentChildren</p>
 
-    <button (click)="refresh()">Refresh</button>
-    <button (click)="loadNext()">Load next</button><br /><br />
+    <app-eg27_child>
+      <div #c1>ContentChild</div>
+      @for (i of contentChildrens(); track $index) {
+        <div #c2>ContentChildren</div>
+      }
+    </app-eg27_child>
 
-    @if (userResource.isLoading()) {
-      Loading...
-    }
-
-    @if (userResource.hasValue()) {
-      {{ userResource.value()[0].title }}
-    }
-
-    @if (userResource.error != null) {
-      {{ userResource.error() | json }}
-    }
+    <br /><br />
+    <button (click)="addContentChildren()">Add Content Children</button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg27 {
-  userId = signal(1);
+  contentChildrens = signal<number[]>([]);
 
-  userResource = httpResource<{ title: string }[]>(() => ({
-    url: `https://jsonplaceholder.typicode.com/posts`,
-    method: 'GET',
-    params: { userId: this.userId() },
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }));
-
-  refresh(): void {
-    this.userResource.reload();
-  }
-
-  loadNext(): void {
-    this.userId.update((x) => x + 1);
+  addContentChildren(): void {
+    this.contentChildrens.update((x) => [...x, 1]);
   }
 }

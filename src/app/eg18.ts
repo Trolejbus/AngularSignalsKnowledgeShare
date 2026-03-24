@@ -1,36 +1,59 @@
 import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
 
-// After Render Effect
-// afterNextRender
-// https://angular.dev/api/core/afterRenderEffect
-
 @Component({
   selector: 'app-eg18',
   imports: [],
   template: `
     <h2>Example 18</h2>
-    <p style="color: #777">effect - onCleanup</p>
-    {{ counter() }}
+    <p style="color: #777">effect - when to set signals in effect</p>
+
+    User ID: {{ userId() }}<br /><br />
+
+    <div style="display: flex; margin-bottom: 100px;">
+      <div
+        [style.color]="selectedTab() == 1 ? 'red' : 'black'"
+        style="width: 100px;"
+        (click)="changeTab(1)"
+      >
+        Profile
+      </div>
+      <div
+        [style.color]="selectedTab() == 2 ? 'red' : 'black'"
+        style="width: 100px;"
+        (click)="changeTab(2)"
+      >
+        Activities
+      </div>
+      <div
+        [style.color]="selectedTab() == 3 ? 'red' : 'black'"
+        style="width: 100px;"
+        (click)="changeTab(3)"
+      >
+        Logs
+      </div>
+    </div>
+
+    <button (click)="loadDifferentCounter()">Load Different User</button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg18 {
-  counter = signal(0);
+  userId = signal(1);
+  selectedTab = signal(1);
 
   constructor() {
-    effect((onCleanup) => {
-      let iterator = 0;
-      const intervalId = setInterval(() => {
-        console.log(iterator);
-        this.counter.update((x) => x + 1);
-      }, 1000);
+    effect(() => {
+      this.userId();
 
-      onCleanup(() => {
-        console.log('onCleanup()');
-        clearInterval(intervalId);
-      });
+      this.selectedTab.set(1);
     });
+  }
 
-    // manualCleanup: true
+  changeTab(tabIndex: number): void {
+    this.selectedTab.set(tabIndex);
+  }
+
+  loadDifferentCounter(): void {
+    this.userId.update((x) => x + 1);
   }
 }

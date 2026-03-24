@@ -1,52 +1,64 @@
-import { JsonPipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DoCheck, input, signal } from '@angular/core';
 
-// https://medium.com/@giorgio.galassi/angular-v19-understanding-the-new-resource-and-rxresource-apis-8a387c7d9351
+@Component({
+  selector: 'character-view',
+  template: `
+    Name: {{ name() }}<br />
+    Surname: {{ surname() }}<br />
+    Email: {{ email() }}<br />
+    Tags: {{ tags() }}<br />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CharacterView implements DoCheck {
+  name = input.required<string>();
+  surname = input<string>('-');
+  email = input<string>('-', {
+    alias: 'mail',
+    // Better not to use
+  });
+  tags = input<string, string[]>('', {
+    transform: (value: string[]) => value.join(','),
+    // Usefull for directives parameters etc
+  });
 
-// https://www.angulararchitects.io/blog/using-the-resource-api-with-the-ngrx-signal-store/
+  ngDoCheck(): void {
+    console.log('Child check');
+  }
+}
 
 @Component({
   selector: 'app-eg26',
-  imports: [JsonPipe],
+  imports: [CharacterView],
   template: `
-    <h2>Example 26</h2>
-    <p style="color: #777">rxResource</p>
+    <h2>Example 21</h2>
+    <p style="color: #777">input</p>
 
-    <button (click)="refresh()">Refresh</button>
-    <button (click)="loadNext()">Load next</button><br /><br />
-
-    @if (userResource.isLoading()) {
-      Loading...
-    }
-
-    @if (userResource.hasValue()) {
-      {{ userResource.value().title }}
-    }
-
-    @if (userResource.error != null) {
-      {{ userResource.error() | json }}
-    }
+    <character-view
+      [name]="character().name"
+      [surname]="character().surname"
+      [mail]="character().mail"
+      [tags]="character().tags"
+    ></character-view>
+    <br /><br />
+    <button (click)="updateCharacter()">Update Character</button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg26 {
-  private http = inject(HttpClient);
-
-  userId = signal(1);
-
-  userResource = rxResource({
-    params: () => ({ id: this.userId() }),
-    stream: ({ params }) =>
-      this.http.get<any>(`https://jsonplaceholder.typicode.com/posts/${params.id}`),
+  character = signal({
+    name: 'James',
+    surname: 'Bond',
+    mail: 'james.bond@mi-6.org',
+    tags: ['top', 'secret'],
   });
 
-  refresh(): void {
-    this.userResource.reload();
-  }
-
-  loadNext(): void {
-    this.userId.update((x) => x + 1);
+  updateCharacter(): void {
+    this.character.set({
+      name: 'Severus',
+      surname: 'Snape',
+      mail: 'severus.snape@hogward.edu',
+      tags: ['hate', 'Potter'],
+    });
   }
 }

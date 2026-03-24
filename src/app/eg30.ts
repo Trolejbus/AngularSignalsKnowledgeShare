@@ -1,43 +1,50 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { debounce, form, FormField, required } from '@angular/forms/signals';
-
-interface Character {
-  name: string;
-  surname: string;
-}
+import { ChangeDetectionStrategy, Component, linkedSignal, signal } from '@angular/core';
 
 @Component({
   selector: 'app-eg30',
-  imports: [FormField],
+  imports: [],
   template: `
     <h2>Example 30</h2>
-    <p style="color: #777">signal forms</p>
+    <p style="color: #777">linkedSignal</p>
 
-    <input type="name" [formField]="loginForm.name" />
-    <input type="surname" [formField]="loginForm.surname" />
-    @if (loginForm.surname().touched() && loginForm.surname().invalid()) {
-      <ul class="error-list">
-        @for (error of loginForm.surname().errors(); track error) {
-          <li>{{ error.message }}</li>
-        }
-      </ul>
-    }
+    Original: {{ originalCharacter().name }} <br /><br />
+    Current: {{ character().name }} <br /><br />
 
-    <div>
-      {{ loginForm.name().value() }}
-      {{ loginForm.surname().value() }}
-    </div>
+    <input type="text" (input)="updateText($event)" />
+
+    <br />
+    <br />
+    <hr />
+    <br />
+
+    <button (click)="loadOtherCharacter()">Load other character</button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg30 {
-  loginModel = signal<Character>({
-    name: '',
-    surname: '',
+  originalCharacter = signal({
+    name: 'James',
   });
 
-  loginForm = form(this.loginModel, (schemaPath) => {
-    debounce(schemaPath.name, 500);
-    required(schemaPath.surname, { message: 'Surname is required' });
-  });
+  character = linkedSignal(() => this.originalCharacter());
+
+  constructor() {}
+
+  updateText(event: Event): void {
+    this.character.set({
+      name: (event.target as any).value,
+    });
+  }
+
+  loadOtherCharacter(): void {
+    this.originalCharacter.update((x) =>
+      x.name === 'Severus Snape'
+        ? {
+            name: 'James Bond',
+          }
+        : {
+            name: 'Severus Snape',
+          },
+    );
+  }
 }

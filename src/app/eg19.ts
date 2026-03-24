@@ -1,114 +1,46 @@
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DoCheck, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-@Component({
-  selector: 'rxjs-example',
-  imports: [AsyncPipe],
-  template: `Rxjs Counter: {{ counter$ | async }} {{ notifyBindingsUpdated() }}`,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class RxjsExample implements DoCheck {
-  counter$ = new BehaviorSubject(0);
-
-  increment(): void {
-    this.counter$.next(this.counter$.value + 1);
-  }
-
-  intervalId = setInterval(() => {
-    this.increment();
-  }, 1000);
-
-  ngOnDestroy() {
-    clearInterval(this.intervalId);
-  }
-
-  notifyBindingsUpdated() {
-    console.log('RXJS Bindings Updated');
-    return '';
-  }
-
-  ngDoCheck(): void {
-    console.log('Rxjs Check');
-  }
-}
-
-@Component({
-  selector: 'signal-example',
-  template: `Signal Counter: {{ counter() }} {{ notifyBindingsUpdated() }}`,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class SignalExample implements DoCheck {
-  counter = signal(0);
-
-  increment(): void {
-    this.counter.update((x) => x + 1);
-  }
-
-  intervalId = setInterval(() => {
-    this.increment();
-  }, 1000);
-
-  ngOnDestroy() {
-    clearInterval(this.intervalId);
-  }
-
-  notifyBindingsUpdated() {
-    console.log('Signal Bindings Updated');
-    return '';
-  }
-
-  ngDoCheck(): void {
-    console.log('Signal Check');
-  }
-}
+import { JsonPipe } from '@angular/common';
+import { Component, effect, EffectRef, inject, Injector, signal } from '@angular/core';
 
 @Component({
   selector: 'app-eg19',
-  imports: [RxjsExample, SignalExample],
+  imports: [JsonPipe],
   template: `
     <h2>Example 19</h2>
-    <p style="color: #777">effect - difference between rxjs and signals in change detection</p>
+    <p style="color: #777">effect - how to create effect outside of constructor</p>
 
-    {{ notifyBindingsUpdated() }}
-
-    @if (signalExample()) {
-      <signal-example></signal-example><br /><br />
-    }
-
-    @if (rxjsExample()) {
-      <rxjs-example></rxjs-example><br /><br />
-    }
-
-    <button (click)="toggleSignalExample()">
-      {{ signalExample() ? 'Hide signal example' : 'Show signal example' }}
-    </button>
-    <button (click)="toggleRXJSExample()">
-      {{ rxjsExample() ? 'Hide rxjs example' : 'Show rxjs example' }}
-    </button>
+    {{ counter() }}<br /><br />
+    <button (click)="incremenent()">+1</button>
+    <button (click)="startListening()">Start listening</button>
+    <button (click)="stopListening()">Stop listening</button>
+    <br />
+    <br />
+    <hr />
+    <br />
+    {{ invocations | json }}<br />
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Eg19 implements DoCheck {
-  signalExample = signal(false);
-  rxjsExample = signal(false);
+export class Eg19 {
+  private injector = inject(Injector);
+  counter = signal(0);
+  invocations: number[] = [];
+  effectRef: EffectRef | null = null;
+
+  incremenent(): void {
+    this.counter.update((x) => x + 1);
+  }
+
+  startListening(): void {
+    this.effectRef = effect(
+      () => {
+        this.invocations.push(this.counter());
+      },
+      { injector: this.injector },
+    );
+  }
+
+  stopListening(): void {
+    this.effectRef?.destroy();
+  }
 
   constructor() {}
-
-  toggleSignalExample(): void {
-    this.signalExample.update((x) => !x);
-  }
-
-  toggleRXJSExample(): void {
-    this.rxjsExample.update((x) => !x);
-  }
-
-  notifyBindingsUpdated() {
-    console.log('Parent Bindings Updated');
-    return '';
-  }
-
-  ngDoCheck(): void {
-    console.log('Parent Check');
-  }
 }

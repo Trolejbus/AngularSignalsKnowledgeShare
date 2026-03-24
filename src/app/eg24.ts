@@ -1,50 +1,34 @@
-import { ChangeDetectionStrategy, Component, linkedSignal, signal } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-eg24',
   imports: [],
   template: `
     <h2>Example 24</h2>
-    <p style="color: #777">linkedSignal</p>
-
-    Original: {{ originalCharacter().name }} <br /><br />
-    Current: {{ character().name }} <br /><br />
-
-    <input type="text" (input)="updateText($event)" />
-
-    <br />
-    <br />
-    <hr />
-    <br />
-
-    <button (click)="loadOtherCharacter()">Load other character</button>
+    {{ character() ?? 'no value' }}
+    <br /><br />
+    <button (click)="changeCharacter()">Change Character</button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg24 {
-  originalCharacter = signal({
-    name: 'James',
-  });
+  character1 = false;
+  character$ = new Subject<string>();
 
-  character = linkedSignal(() => this.originalCharacter());
+  character = toSignal(this.character$); // requireSync: true
+  characterWithInitial = toSignal(this.character$, { initialValue: 'Harry' });
 
-  constructor() {}
-
-  updateText(event: Event): void {
-    this.character.set({
-      name: (event.target as any).value,
+  constructor() {
+    effect(() => {
+      console.log(this.character());
     });
   }
 
-  loadOtherCharacter(): void {
-    this.originalCharacter.update((x) =>
-      x.name === 'Severus Snape'
-        ? {
-            name: 'James Bond',
-          }
-        : {
-            name: 'Severus Snape',
-          },
-    );
+  changeCharacter(): void {
+    this.character$.next(this.character1 ? 'Severus' : 'James');
+    this.character1 = !this.character1;
   }
 }

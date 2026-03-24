@@ -1,33 +1,40 @@
-import { JsonPipe } from '@angular/common';
-import { Component, effect, signal } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, computed, signal } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-eg13',
-  imports: [JsonPipe],
+  imports: [AsyncPipe],
   template: `
     <h2>Example 13</h2>
-    <p style="color: #777">effect - used for side effects</p>
+    <p style="color: #777">computed - can set equal to determine if computed was changed</p>
 
-    {{ counter() }}<br /><br />
-    <button (click)="increment()">+1</button>
+    {{ name() }}<br /><br />
+
+    <button (click)="peek()">Peek computed</button>
+    <button (click)="nextCharacter()">Next character</button>
     <br />
     <br />
     <hr />
     <br />
-    {{ invocations | json }}<br />
+    computed triggered times: {{ computedTriggered$ | async }}<br />
   `,
 })
 export class Eg13 {
-  counter = signal(0);
-  invocations: number[] = [];
+  computedTriggered$ = new BehaviorSubject(0);
 
-  increment(): void {
-    this.counter.update((x) => x + 1);
+  name = signal('James');
+
+  characterName = computed(() => {
+    this.computedTriggered$.next(this.computedTriggered$.value + 1);
+    return `My name is ${this.name()}`;
+  });
+
+  peek(): void {
+    this.name.set(this.characterName());
   }
 
-  constructor() {
-    effect(() => {
-      this.invocations.push(this.counter());
-    });
+  nextCharacter(): void {
+    this.name.update((x) => (x.includes('James') ? 'Severus' : 'James'));
   }
 }

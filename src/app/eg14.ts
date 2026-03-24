@@ -1,37 +1,37 @@
-import { JsonPipe } from '@angular/common';
-import { Component, effect, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 
 @Component({
   selector: 'app-eg14',
-  imports: [JsonPipe],
+  imports: [],
   template: `
     <h2>Example 14</h2>
-    <p style="color: #777">effect - is also batching changes & tracking only </p>
+    <p style="color: #777">computed - can set equal to determine if computed was changed</p>
 
-    {{ counter() }}<br /><br />
-    <button (click)="increment()">+1</button>
-    <br />
-    <br />
-    <hr />
-    <br />
-    {{ invocations | json }}<br />
+    With equal: {{ characterNameWithEqual() }}<br /><br />
+    Without equal: {{ characterName() }}<br /><br />
+
+    <button (click)="changeToLowerCase()">Change to Lower Case</button>
+    <button (click)="changeToUpperCase()">Change to Upper Case</button>
+    <button (click)="changeName()">Change Name</button>
   `,
 })
 export class Eg14 {
-  counter = signal(0);
-  invocations: number[] = [];
+  name = signal('James');
 
-  increment(): void {
-    this.counter.update((x) => x + 1);
-    this.counter.update((x) => x + 1);
+  characterName = computed(() => `My name is ${this.name()}`);
+  characterNameWithEqual = computed(() => `My name is ${this.name()}`, {
+    equal: (a, b) => a.toLocaleLowerCase() === b.toLocaleLowerCase(),
+  });
+
+  changeToLowerCase(): void {
+    this.name.update((x) => x.toLocaleLowerCase());
   }
 
-  constructor() {
-    effect(() => {
-      console.log('effect run');
-      this.invocations.push(this.counter());
-    });
+  changeToUpperCase(): void {
+    this.name.update((x) => x.toLocaleUpperCase());
+  }
 
-    console.log('after effect');
+  changeName(): void {
+    this.name.update((x) => (x.toLocaleLowerCase() === 'james' ? 'Harry' : 'James'));
   }
 }

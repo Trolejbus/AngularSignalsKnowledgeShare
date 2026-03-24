@@ -1,46 +1,41 @@
-import { JsonPipe } from '@angular/common';
-import { Component, effect, EffectRef, inject, Injector, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 
 @Component({
   selector: 'app-eg17',
-  imports: [JsonPipe],
+  imports: [],
   template: `
     <h2>Example 17</h2>
-    <p style="color: #777">effect - how to create effect outside of constructor</p>
+    <p style="color: #777">effect - allowSignalWrites</p>
 
-    {{ counter() }}<br /><br />
-    <button (click)="incremenent()">+1</button>
-    <button (click)="startListening()">Start listening</button>
-    <button (click)="stopListening()">Stop listening</button>
-    <br />
-    <br />
-    <hr />
-    <br />
-    {{ invocations | json }}<br />
+    Counter 1: {{ counter1() }}<br /><br />
+    Counter 2: {{ counter2() }}<br /><br />
+    <button (click)="incrementCounter1()">Counter1 +1</button>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg17 {
-  private injector = inject(Injector);
-  counter = signal(0);
+  counter1 = signal(0);
+  counter2 = signal(0);
+  counter2Wrapper = computed(() => `${this.counter2()}`);
+  otherCounter = signal(0);
   invocations: number[] = [];
-  effectRef: EffectRef | null = null;
 
-  incremenent(): void {
-    this.counter.update((x) => x + 1);
+  incrementCounter1(): void {
+    console.log('Counter1 +1 clicked');
+    queueMicrotask(() => console.log('Microtask 1'));
+    this.counter1.update((x) => x + 1);
   }
 
-  startListening(): void {
-    this.effectRef = effect(
-      () => {
-        this.invocations.push(this.counter());
-      },
-      { injector: this.injector },
-    );
-  }
+  constructor() {
+    effect(() => {
+      queueMicrotask(() => console.log('Microtask 2'));
+      console.log('effect 1');
+      this.counter2.set(this.counter1());
+    });
 
-  stopListening(): void {
-    this.effectRef?.destroy();
+    effect(() => {
+      this.counter2Wrapper();
+      console.log('effect 2');
+    });
   }
-
-  constructor() {}
 }

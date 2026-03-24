@@ -1,55 +1,58 @@
-import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DoCheck, signal } from '@angular/core';
 
 @Component({
   selector: 'app-eg25',
-  imports: [JsonPipe],
+  imports: [],
   template: `
     <h2>Example 25</h2>
-    <p style="color: #777">resource</p>
+    <p style="color: #777">
+      effect - difference in change detection between 'character().age' and 'characterAge()'
+    </p>
 
-    <button (click)="refresh()">Refresh</button>
-    <button (click)="loadNext()">Load next</button><br /><br />
+    <p>{{ displayComputed() ? 'characterAge()' : 'character().age' }}</p>
 
-    @if (userResource.isLoading()) {
-      Loading...
+    @if (displayComputed()) {
+      Character age: {{ characterAge() }}<br /><br />
+    } @else {
+      Character age: {{ character().age }}<br /><br />
     }
 
-    @if (userResource.hasValue()) {
-      {{ userResource.value()[0].title }}
-    }
+    <button (click)="toggleDisplayComputed()">
+      {{ displayComputed() ? 'character().age' : 'characterAge()' }}
+    </button>
 
-    @if (userResource.error != null) {
-      {{ userResource.error() | json }}
-    }
-
-    <br />
-    <br />
-    <hr />
-    <br />
+    {{ notifyBindingsUpdated() }}
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Eg25 {
-  userId = signal(1);
+export class Eg25 implements DoCheck {
+  displayComputed = signal(true);
 
-  userResource = resource({
-    params: () => ({ id: this.userId() }),
-    loader: ({
-      params,
-      abortSignal,
-    }): Promise<{ userId: number; id: number; title: string; body: string }[]> => {
-      return fetch(`https://jsonplaceholder.typicode.com/posts/`, { signal: abortSignal }).then(
-        (x) => x.json(),
-      );
-    },
+  character = signal({
+    age: 30,
   });
 
-  refresh(): void {
-    this.userResource.reload();
+  characterAge = computed(() => this.character().age);
+
+  constructor() {
+    setInterval(() => {
+      this.character.set({
+        ...this.character,
+        age: 30,
+      });
+    }, 1000);
   }
 
-  loadNext(): void {
-    this.userId.update((x) => x + 1);
+  toggleDisplayComputed(): void {
+    this.displayComputed.update((x) => !x);
+  }
+
+  notifyBindingsUpdated() {
+    console.log('Parent Bindings Updated');
+    return '';
+  }
+
+  ngDoCheck(): void {
+    console.log('Check');
   }
 }

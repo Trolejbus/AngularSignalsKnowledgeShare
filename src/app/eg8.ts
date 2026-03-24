@@ -6,45 +6,39 @@ import { BehaviorSubject } from 'rxjs';
   selector: 'app-eg8',
   imports: [AsyncPipe],
   template: `
-    <h2>Example 7</h2>
-    <p style="color: #777">computed - Will trigger computed only when changes</p>
-    <p style="color: #777">signal() is not memoized</p>
+    <h2>Example 8</h2>
+    <p style="color: #888">computed - Is memoized, runs only once even when used multiple times</p>
 
-    {{ displayedComputed() }}<br /><br />
+    {{ characterName() }}<br /><br />
+    {{ characterName() }}<br /><br />
+    {{ characterName() }}<br /><br />
+    {{ characterName() }}<br /><br />
 
-    <button (click)="updateName('James Bond')">Update to Bond</button>
-    <button (click)="updateName('Severus Snape')">Update to Severus</button>
+    <button (click)="updateName()">Update name</button>
     <br />
     <br />
     <hr />
     <br />
-    computedCharacterName triggered times: {{ computedCharacterNameTriggered$ | async }}<br />
-    computedDisplayed triggered times: {{ displayedComputedTriggered$ | async }}
+    Computed triggered times: {{ computedTriggered$ | async }}
   `,
 })
 export class Eg8 {
-  computedCharacterNameTriggered$ = new BehaviorSubject(0);
-  displayedComputedTriggered$ = new BehaviorSubject(0);
+  computedTriggered$ = new BehaviorSubject(0);
 
   character = signal({
     name: 'Bond',
     age: 35,
   });
 
-  displayedComputed = computed(() => {
-    this.displayedComputedTriggered$.next(this.displayedComputedTriggered$.value + 1);
-    return `Human said: ${this.characterName()}`;
-  });
-
   characterName = computed(() => {
-    this.computedCharacterNameTriggered$.next(this.computedCharacterNameTriggered$.value + 1);
+    this.computedTriggered$.next(this.computedTriggered$.value + 1);
     return `My name is ${this.character().name}`;
   });
 
-  updateName(name: string): void {
+  updateName(): void {
     this.character.update((x) => ({
       ...x,
-      name,
+      name: 'James Bond',
     }));
   }
 }

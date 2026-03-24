@@ -5,25 +5,18 @@ import { Component, computed, signal } from '@angular/core';
   imports: [],
   template: `
     <h2>Example 4</h2>
-    <p style="color: #777">computed - Problems with mutation</p>
+    <p style="color: #777">computed - computes values based on other signals</p>
 
-    My name is {{ character().name }}<br /><br />
     {{ characterName() }}<br /><br />
-    <button (click)="changeName()">Change name (mutate)</button>
+    <button (click)="changeName()">Change Name</button>
   `,
 })
 export class Eg4 {
-  character = signal({
-    name: 'Bond',
-    age: 35,
-  });
+  fullName = signal('Bond');
 
-  characterName = computed(() => `My name is ${this.character().name}`);
+  characterName = computed(() => `My name is ${this.fullName()}`);
 
   changeName(): void {
-    this.character.update((x) => {
-      x.name = 'James Bond';
-      return x;
-    });
+    this.fullName.set('James Bond');
   }
 }

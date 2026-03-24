@@ -1,44 +1,30 @@
-import { ChangeDetectionStrategy, Component, model, signal } from '@angular/core';
-
-@Component({
-  selector: 'character-view',
-  template: `
-    Child: {{ counter() }} <br /><br />
-    <button (click)="increment()">Increment Child</button>
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class CharacterView {
-  counter = model.required<number>();
-
-  increment(): void {
-    this.counter.update((x) => x + 1);
-  }
-}
+import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { take, tap } from 'rxjs';
 
 @Component({
   selector: 'app-eg23',
-  imports: [CharacterView],
+  imports: [AsyncPipe],
   template: `
     <h2>Example 23</h2>
-    <p style="color: #777">model</p>
-
-    <character-view [(counter)]="counter"></character-view>
-
-    <br />
-    <br />
-    <hr />
-    <br />
-
-    Counter: {{ counter() }} <br /><br />
-    <button (click)="increment()">Increment Parent</button>
+    {{ character$ | async }}
+    <br /><br />
+    <button (click)="changeCharacter()">Change Character</button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg23 {
-  counter = signal(0);
+  character = signal('James');
 
-  increment(): void {
-    this.counter.update((x) => x + 1);
+  character$ = toObservable(this.character).pipe(tap((x) => console.log('Rxjs updated')));
+
+  changeCharacter(): void {
+    queueMicrotask(() => console.log('Microtask'));
+    this.character.update((x) => (x === 'James' ? 'Severus' : 'James'));
+
+    this.character$.pipe(take(1)).subscribe((x) => {
+      console.log(x);
+    });
   }
 }

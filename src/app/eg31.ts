@@ -1,49 +1,55 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, resource, signal } from '@angular/core';
 
 @Component({
   selector: 'app-eg31',
   imports: [JsonPipe],
   template: `
     <h2>Example 31</h2>
-    <p style="color: #777">devtools</p>
+    <p style="color: #777">resource</p>
 
-    <b>Characters: </b>{{ characters() | json }}<br />
-    <b>Badges: </b>{{ characterBadges() | json }}<br />
-    <b>James Bond: </b>{{ jamesBond() | json }}<br />
-    <b>James Bond With Badges: </b>{{ jamesBondWithBadges() | json }}<br />
+    <button (click)="refresh()">Refresh</button>
+    <button (click)="loadNext()">Load next</button><br /><br />
+
+    @if (userResource.isLoading()) {
+      Loading...
+    }
+
+    @if (userResource.hasValue()) {
+      {{ userResource.value()[0].title }}
+    }
+
+    @if (userResource.error != null) {
+      {{ userResource.error() | json }}
+    }
+
+    <br />
+    <br />
+    <hr />
+    <br />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg31 {
-  characters = signal<
-    {
-      id: number;
-      firstName: string;
-    }[]
-  >([
-    {
-      id: 1,
-      firstName: 'James',
-    },
-    {
-      id: 2,
-      firstName: 'Severus',
-    },
-  ]);
+  userId = signal(1);
 
-  jamesBond = computed(() => this.characters().find((x) => x.firstName === 'James'));
-  characterBadges = signal<{ badge: string; id: number }[]>([
-    { badge: 'Top secret', id: 1 },
-    { badge: 'Not secret', id: 2 },
-  ]);
-  jamesBondWithBadges = computed(() =>
-    this.characterBadges().find((x) => x.id === this.jamesBond()?.id),
-  );
+  userResource = resource({
+    params: () => ({ id: this.userId() }),
+    loader: ({
+      params,
+      abortSignal,
+    }): Promise<{ userId: number; id: number; title: string; body: string }[]> => {
+      return fetch(`https://jsonplaceholder.typicode.com/posts/`, { signal: abortSignal }).then(
+        (x) => x.json(),
+      );
+    },
+  });
 
-  constructor() {
-    effect(() => {
-      console.log(this.jamesBondWithBadges());
-    });
+  refresh(): void {
+    this.userResource.reload();
+  }
+
+  loadNext(): void {
+    this.userId.update((x) => x + 1);
   }
 }

@@ -1,74 +1,114 @@
-import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
-import { outputFromObservable, outputToObservable } from '@angular/core/rxjs-interop';
+import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DoCheck, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
-  selector: 'character-view',
-  template: `
-    <button (click)="buttonClicked()">Remove</button><br /><br />
-    {{ counter() }} <button (click)="increment()">+1</button><br /><br />
-  `,
+  selector: 'rxjs-example',
+  imports: [AsyncPipe],
+  template: `Rxjs Counter: {{ counter$ | async }} {{ notifyBindingsUpdated() }}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CharacterView {
-  counter = signal(0);
+export class RxjsExample implements DoCheck {
+  counter$ = new BehaviorSubject(0);
 
-  removeClicked = output<void>();
-  counterUpdated = output<number>();
-  likeClickedOutput = output<number>({
-    alias: 'likeClicked',
-  });
-
-  private obs$ = new BehaviorSubject(0);
-  obs = outputFromObservable(this.obs$);
-  obs2$ = outputToObservable(this.obs);
-
-  buttonClicked(): void {
-    this.removeClicked.emit();
+  increment(): void {
+    this.counter$.next(this.counter$.value + 1);
   }
+
+  intervalId = setInterval(() => {
+    this.increment();
+  }, 1000);
+
+  ngOnDestroy() {
+    clearInterval(this.intervalId);
+  }
+
+  notifyBindingsUpdated() {
+    console.log('RXJS Bindings Updated');
+    return '';
+  }
+
+  ngDoCheck(): void {
+    console.log('Rxjs Check');
+  }
+}
+
+@Component({
+  selector: 'signal-example',
+  template: `Signal Counter: {{ counter() }} {{ notifyBindingsUpdated() }}`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class SignalExample implements DoCheck {
+  counter = signal(0);
 
   increment(): void {
     this.counter.update((x) => x + 1);
-    this.counterUpdated.emit(this.counter());
+  }
+
+  intervalId = setInterval(() => {
+    this.increment();
+  }, 1000);
+
+  ngOnDestroy() {
+    clearInterval(this.intervalId);
+  }
+
+  notifyBindingsUpdated() {
+    console.log('Signal Bindings Updated');
+    return '';
+  }
+
+  ngDoCheck(): void {
+    console.log('Signal Check');
   }
 }
 
 @Component({
   selector: 'app-eg22',
-  imports: [CharacterView],
+  imports: [RxjsExample, SignalExample],
   template: `
     <h2>Example 22</h2>
-    <p style="color: #777">output</p>
+    <p style="color: #777">Difference between rxjs and signals in change detection</p>
 
-    <character-view
-      (removeClicked)="removeClicked()"
-      (counterUpdated)="updateCounter($event)"
-      (likeClicked)="likeClicked()"
-    ></character-view>
+    {{ notifyBindingsUpdated() }}
 
-    <br />
-    <br />
-    <hr />
-    <br />
-
-    @if (removed()) {
-      (Removed) <br />
+    @if (signalExample()) {
+      <signal-example></signal-example><br /><br />
     }
-    Counter: {{ counter() }}
+
+    @if (rxjsExample()) {
+      <rxjs-example></rxjs-example><br /><br />
+    }
+
+    <button (click)="toggleSignalExample()">
+      {{ signalExample() ? 'Hide signal example' : 'Show signal example' }}
+    </button>
+    <button (click)="toggleRXJSExample()">
+      {{ rxjsExample() ? 'Hide rxjs example' : 'Show rxjs example' }}
+    </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Eg22 {
-  removed = signal(false);
-  counter = signal(0);
+export class Eg22 implements DoCheck {
+  signalExample = signal(false);
+  rxjsExample = signal(false);
 
-  removeClicked(): void {
-    this.removed.set(true);
+  constructor() {}
+
+  toggleSignalExample(): void {
+    this.signalExample.update((x) => !x);
   }
 
-  updateCounter(value: number): void {
-    this.counter.set(value);
+  toggleRXJSExample(): void {
+    this.rxjsExample.update((x) => !x);
   }
 
-  likeClicked(): void {}
+  notifyBindingsUpdated() {
+    console.log('Parent Bindings Updated');
+    return '';
+  }
+
+  ngDoCheck(): void {
+    console.log('Parent Check');
+  }
 }

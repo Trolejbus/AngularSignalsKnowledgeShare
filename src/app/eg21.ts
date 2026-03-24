@@ -1,64 +1,36 @@
-import { ChangeDetectionStrategy, Component, DoCheck, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
 
-@Component({
-  selector: 'character-view',
-  template: `
-    Name: {{ name() }}<br />
-    Surname: {{ surname() }}<br />
-    Email: {{ email() }}<br />
-    Tags: {{ tags() }}<br />
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class CharacterView implements DoCheck {
-  name = input.required<string>();
-  surname = input<string>('-');
-  email = input<string>('-', {
-    alias: 'mail',
-    // Better not to use
-  });
-  tags = input<string, string[]>('', {
-    transform: (value: string[]) => value.join(','),
-    // Usefull for directives parameters etc
-  });
-
-  ngDoCheck(): void {
-    console.log('Child check');
-  }
-}
+// After Render Effect
+// afterNextRender
+// https://angular.dev/api/core/afterRenderEffect
 
 @Component({
   selector: 'app-eg21',
-  imports: [CharacterView],
+  imports: [],
   template: `
     <h2>Example 21</h2>
-    <p style="color: #777">input</p>
-
-    <character-view
-      [name]="character().name"
-      [surname]="character().surname"
-      [mail]="character().mail"
-      [tags]="character().tags"
-    ></character-view>
-    <br /><br />
-    <button (click)="updateCharacter()">Update Character</button>
+    <p style="color: #777">effect - onCleanup</p>
+    {{ counter() }}
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg21 {
-  character = signal({
-    name: 'James',
-    surname: 'Bond',
-    mail: 'james.bond@mi-6.org',
-    tags: ['top', 'secret'],
-  });
+  counter = signal(0);
 
-  updateCharacter(): void {
-    this.character.set({
-      name: 'Severus',
-      surname: 'Snape',
-      mail: 'severus.snape@hogward.edu',
-      tags: ['hate', 'Potter'],
+  constructor() {
+    effect((onCleanup) => {
+      let iterator = 0;
+      const intervalId = setInterval(() => {
+        console.log(iterator);
+        this.counter.update((x) => x + 1);
+      }, 1000);
+
+      onCleanup(() => {
+        console.log('onCleanup()');
+        clearInterval(intervalId);
+      });
     });
+
+    // manualCleanup: true
   }
 }

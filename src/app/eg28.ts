@@ -1,88 +1,74 @@
-import { httpResource } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, Injectable, Signal } from '@angular/core';
-import {
-  patchState,
-  signalStore,
-  withComputed,
-  withMethods,
-  withProps,
-  withState,
-} from '@ngrx/signals';
+import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
+import { outputFromObservable, outputToObservable } from '@angular/core/rxjs-interop';
+import { BehaviorSubject } from 'rxjs';
 
-// https://www.angulararchitects.io/blog/using-the-resource-api-with-the-ngrx-signal-store/
-// https://medium.com/@schnabelelisa0/integrating-httpresource-with-signalstore-in-angular-4962fdc22a2e
+@Component({
+  selector: 'character-view',
+  template: `
+    <button (click)="buttonClicked()">Remove</button><br /><br />
+    {{ counter() }} <button (click)="increment()">+1</button><br /><br />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CharacterView {
+  counter = signal(0);
 
-type UserState = {
-  currentPage: number;
-};
+  removeClicked = output<void>();
+  counterUpdated = output<number>();
+  likeClickedOutput = output<number>({
+    alias: 'likeClicked',
+  });
 
-const initialState: UserState = {
-  currentPage: 1,
-};
+  private obs$ = new BehaviorSubject(0);
+  obs = outputFromObservable(this.obs$);
+  obs2$ = outputToObservable(this.obs);
 
-@Injectable({ providedIn: 'root' })
-export class UsersApi {
-  public usersResource(userId: Signal<number>) {
-    return httpResource<User[]>(() => ({
-      url: `https://jsonplaceholder.typicode.com/posts`,
-      method: 'GET',
-      params: { userId: userId() },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }));
+  buttonClicked(): void {
+    this.removeClicked.emit();
+  }
+
+  increment(): void {
+    this.counter.update((x) => x + 1);
+    this.counterUpdated.emit(this.counter());
   }
 }
 
-export interface User {
-  title: string;
-}
-
-export const UserStore = signalStore(
-  { providedIn: 'root' },
-  withState(initialState),
-  withProps(() => ({
-    usersApi: inject(UsersApi),
-  })),
-  withProps(({ usersApi, currentPage }) => ({
-    _users: usersApi.usersResource(currentPage),
-  })),
-  withComputed(({ _users }) => ({
-    users: () => {
-      return _users.hasValue() ? _users.value() : [];
-    },
-    usersLoading: () => {
-      return _users.isLoading();
-    },
-    usersError: () => {
-      return _users.error();
-    },
-  })),
-  withMethods((store) => ({
-    nextUser: () => {
-      const newPage = store.currentPage() + 1;
-      patchState(store, { currentPage: newPage });
-    },
-  })),
-);
-
 @Component({
   selector: 'app-eg28',
+  imports: [CharacterView],
   template: `
     <h2>Example 28</h2>
-    <p style="color: #777">ngrx signal store</p>
+    <p style="color: #777">output</p>
 
-    @if (store.usersLoading()) {
-      Loading....
-    } @else if (store.usersError()) {
-      Error occured while loading users!
-    } @else {
-      {{ store.users()[0].title }}<br /><br />
-      <button (click)="store.nextUser()">next</button>
+    <character-view
+      (removeClicked)="removeClicked()"
+      (counterUpdated)="updateCounter($event)"
+      (likeClicked)="likeClicked()"
+    ></character-view>
+
+    <br />
+    <br />
+    <hr />
+    <br />
+
+    @if (removed()) {
+      (Removed) <br />
     }
+    Counter: {{ counter() }}
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eg28 {
-  protected readonly store = inject(UserStore);
+  removed = signal(false);
+  counter = signal(0);
+
+  removeClicked(): void {
+    this.removed.set(true);
+  }
+
+  updateCounter(value: number): void {
+    this.counter.set(value);
+  }
+
+  likeClicked(): void {}
 }

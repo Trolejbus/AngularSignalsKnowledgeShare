@@ -14,7 +14,6 @@ import { Eg12 } from './eg12';
 import { Eg13 } from './eg13';
 import { Eg14 } from './eg14';
 import { Eg15 } from './eg15';
-import { Eg2_2 } from './eg2_2';
 import { Eg16 } from './eg16';
 import { Eg17 } from './eg17';
 import { Eg18 } from './eg18';
@@ -29,12 +28,14 @@ import { Eg26 } from './eg26';
 import { Eg27 } from './eg27';
 import { Eg28 } from './eg28';
 import { Eg29 } from './eg29';
-import { Eg12_2 } from './eg12_2';
-import { Eg20_1 } from './eg20_1';
-import { Eg20_2 } from './eg20_2';
 import { Eg30 } from './eg30';
-import { Eg22_2 } from './eg22_2';
 import { Eg31 } from './eg31';
+import { Eg32 } from './eg32';
+import { Eg33 } from './eg33';
+import { Eg34 } from './eg34';
+import { Eg35 } from './eg35';
+import { Eg36 } from './eg36';
+import { Eg10_1 } from './eg10_1';
 
 export const routes: Routes = [
   {
@@ -44,10 +45,6 @@ export const routes: Routes = [
   {
     path: 'eg2',
     component: Eg2,
-  },
-  {
-    path: 'eg2-2',
-    component: Eg2_2,
   },
   {
     path: 'eg3',
@@ -82,16 +79,16 @@ export const routes: Routes = [
     component: Eg10,
   },
   {
+    path: 'eg10_1',
+    component: Eg10_1,
+  },
+  {
     path: 'eg11',
     component: Eg11,
   },
   {
     path: 'eg12',
     component: Eg12,
-  },
-  {
-    path: 'eg12_2',
-    component: Eg12_2,
   },
   {
     path: 'eg13',
@@ -126,24 +123,12 @@ export const routes: Routes = [
     component: Eg20,
   },
   {
-    path: 'eg20_1',
-    component: Eg20_1,
-  },
-  {
-    path: 'eg20_2',
-    component: Eg20_2,
-  },
-  {
     path: 'eg21',
     component: Eg21,
   },
   {
     path: 'eg22',
     component: Eg22,
-  },
-  {
-    path: 'eg22_2',
-    component: Eg22_2,
   },
   {
     path: 'eg23',
@@ -180,5 +165,25 @@ export const routes: Routes = [
   {
     path: 'eg31',
     component: Eg31,
+  },
+  {
+    path: 'eg32',
+    component: Eg32,
+  },
+  {
+    path: 'eg33',
+    component: Eg33,
+  },
+  {
+    path: 'eg34',
+    component: Eg34,
+  },
+  {
+    path: 'eg35',
+    component: Eg35,
+  },
+  {
+    path: 'eg36',
+    component: Eg36,
   },
 ];

@@ -1,37 +1,28 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, untracked } from '@angular/core';
 
 @Component({
   selector: 'app-eg12',
   imports: [],
   template: `
     <h2>Example 12</h2>
-    <p style="color: #777">computed - can set equal to determine if computed was changed</p>
+    <p style="color: #777">computed - untracked will not trigger computation on change</p>
 
-    With equal: {{ characterNameWithEqual() }}<br /><br />
-    Without equal: {{ characterName() }}<br /><br />
-
-    <button (click)="changeToLowerCase()">Change to Lower Case</button>
-    <button (click)="changeToUpperCase()">Change to Upper Case</button>
-    <button (click)="changeName()">Change Name</button>
+    {{ characterName() }}<br /><br />
+    <button (click)="toggleName()">Change Name</button>
+    <button (click)="makeOlder()">Make Older</button>
   `,
 })
 export class Eg12 {
   name = signal('James');
+  age = signal(30);
 
-  characterName = computed(() => `My name is ${this.name()}`);
-  characterNameWithEqual = computed(() => `My name is ${this.name()}`, {
-    equal: (a, b) => a.toLocaleLowerCase() === b.toLocaleLowerCase(),
-  });
+  characterName = computed(() => `${this.name()} (${untracked(() => this.age())})`);
 
-  changeToLowerCase(): void {
-    this.name.update((x) => x.toLocaleLowerCase());
+  toggleName(): void {
+    this.name.update((x) => (x == 'James' ? 'Harry' : 'James'));
   }
 
-  changeToUpperCase(): void {
-    this.name.update((x) => x.toLocaleUpperCase());
-  }
-
-  changeName(): void {
-    this.name.update((x) => (x.toLocaleLowerCase() === 'james' ? 'Harry' : 'James'));
+  makeOlder(): void {
+    this.age.update((x) => x + 1);
   }
 }

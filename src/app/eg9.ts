@@ -1,79 +1,50 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-import { SIGNAL } from '@angular/core/primitives/signals';
 import { BehaviorSubject } from 'rxjs';
-
-// https://justangular.com/blog/a-change-detection-zone-js-zoneless-local-change-detection-and-signals-story/
-// https://angular.love/the-latest-in-angular-change-detection-zoneless-signals
 
 @Component({
   selector: 'app-eg9',
   imports: [AsyncPipe],
   template: `
     <h2>Example 9</h2>
-    <p style="color: #777">computed - Is calculated by batching all changes</p>
+    <p style="color: #999">computed - Will trigger computed only when changes</p>
+    <p style="color: #999">signal() is not memoized</p>
 
-    {{ fullName() }}<br /><br />
-    {{ fullNameWrapper() }}<br /><br />
+    {{ displayedComputed() }}<br /><br />
 
-    <button (click)="updateName()">Change to Severus Snape</button>
-    <button (click)="updateNameWithConsoleLogs()">
-      Change to Harry Potter (with console logs)
-    </button>
-    <button (click)="consoleLogSignals()">Console log signals</button>
+    <button (click)="updateName('James Bond')">Update to Bond</button>
+    <button (click)="updateName('Severus Snape')">Update to Severus</button>
     <br />
     <br />
     <hr />
     <br />
-    computed triggered times: {{ computedTriggered$ | async }}<br />
+    computedCharacterName triggered times: {{ computedCharacterNameTriggered$ | async }}<br />
+    computedDisplayed triggered times: {{ displayedComputedTriggered$ | async }}
   `,
 })
 export class Eg9 {
-  computedTriggered$ = new BehaviorSubject(0);
+  computedCharacterNameTriggered$ = new BehaviorSubject(0);
+  displayedComputedTriggered$ = new BehaviorSubject(0);
 
-  name = signal('James');
-  surname = signal('Bond');
-
-  fullName = computed(() => {
-    this.computedTriggered$.next(this.computedTriggered$.value + 1);
-    console.log('fullName calculated');
-    return `${this.name()} ${this.surname()}`;
+  character = signal({
+    name: 'Bond',
+    age: 35,
   });
 
-  fullNameWrapper = computed(() => {
-    console.log('fullNameWrapper calculated');
-    return `Wrapper ${this.fullName()}`;
+  displayedComputed = computed(() => {
+    this.displayedComputedTriggered$.next(this.displayedComputedTriggered$.value + 1);
+    return `Human said: ${this.characterName()}`;
   });
 
-  updateName(): void {
-    this.name.set('Severus');
-    this.surname.set('Snape');
-  }
+  characterName = computed(() => {
+    this.computedCharacterNameTriggered$.next(this.computedCharacterNameTriggered$.value + 1);
+    return `My name is ${this.character().name}`;
+  });
 
-  updateNameWithConsoleLogs(): void {
-    queueMicrotask(() => console.log('Microtask'));
-
-    console.log('Before setting firstName');
-    console.log('fullName dirty', (({ ...this.fullName } as any)[SIGNAL] as any).dirty);
-    console.log(
-      'fullNameWrapper dirty',
-      (({ ...this.fullNameWrapper } as any)[SIGNAL] as any).dirty,
-    );
-
-    this.name.set('Harry');
-
-    console.log('After setting firstName');
-    console.log('fullName dirty', (({ ...this.fullName } as any)[SIGNAL] as any).dirty);
-    console.log(
-      'fullNameWrapper dirty',
-      (({ ...this.fullNameWrapper } as any)[SIGNAL] as any).dirty,
-    );
-
-    this.surname.set('Potter');
-  }
-
-  consoleLogSignals(): void {
-    console.log('signal', { ...this.name });
-    console.log('computed', { ...this.fullName });
+  updateName(name: string): void {
+    this.character.update((x) => ({
+      ...x,
+      name,
+    }));
   }
 }
