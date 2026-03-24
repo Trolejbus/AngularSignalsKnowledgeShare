@@ -7,7 +7,7 @@ import { take, tap } from 'rxjs';
   selector: 'app-eg23',
   imports: [AsyncPipe],
   template: `
-    <h2>Example 23</h2>
+    <h2>Example 23 - toObservable</h2>
     {{ character$ | async }}
     <br /><br />
     <button (click)="changeCharacter()">Change Character</button>

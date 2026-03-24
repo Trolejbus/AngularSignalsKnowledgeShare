@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, interval, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-eg7',
@@ -23,7 +23,7 @@ import { BehaviorSubject } from 'rxjs';
     <br />
     <hr />
     <br />
-    Computed triggered times: {{ computedTriggered$ | async }}
+    Computed triggered times: {{ computedTriggeredWorkaround$ | async }}
   `,
 })
 export class Eg7 {
@@ -47,6 +47,11 @@ export class Eg7 {
   toggleCharacter(): void {
     this.showCharacter.update((x) => !x);
   }
+
+  computedTriggeredWorkaround$ = interval(100).pipe(
+    switchMap((x) => this.computedTriggered$),
+    startWith(this.computedTriggered$.value),
+  );
 
   update(): void {
     this.cd.detectChanges();

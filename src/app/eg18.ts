@@ -55,5 +55,6 @@ export class Eg18 {
 
   loadDifferentCounter(): void {
     this.userId.update((x) => x + 1);
+    console.log('Current tab Index: ' + this.selectedTab());
   }
 }

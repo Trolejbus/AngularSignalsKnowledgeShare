@@ -26,7 +26,7 @@ export class Eg8 {
   computedTriggered$ = new BehaviorSubject(0);
 
   character = signal({
-    name: 'Bond',
+    name: 'James Bond',
     age: 35,
   });
 
@@ -36,9 +36,16 @@ export class Eg8 {
   });
 
   updateName(): void {
-    this.character.update((x) => ({
-      ...x,
-      name: 'James Bond',
-    }));
+    this.character.update((x) =>
+      x.name === 'James Bond'
+        ? {
+            ...x,
+            name: 'Severus Snape',
+          }
+        : {
+            ...x,
+            name: 'James Bond',
+          },
+    );
   }
 }

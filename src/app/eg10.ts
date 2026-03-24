@@ -51,7 +51,7 @@ export class Eg10 {
   }
 
   updateNameWithConsoleLogs(): void {
-    queueMicrotask(() => console.log('Microtask before 1'));
+    queueMicrotask(() => console.log('Microtask before'));
 
     console.log('Before setting firstName');
     console.log('fullName dirty', (({ ...this.fullName } as any)[SIGNAL] as any).dirty);
