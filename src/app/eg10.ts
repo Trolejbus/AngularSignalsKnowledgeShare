@@ -53,21 +53,7 @@ export class Eg10 {
   updateNameWithConsoleLogs(): void {
     queueMicrotask(() => console.log('Microtask before'));
 
-    console.log('Before setting firstName');
-    console.log('fullName dirty', (({ ...this.fullName } as any)[SIGNAL] as any).dirty);
-    console.log(
-      'fullNameWrapper dirty',
-      (({ ...this.fullNameWrapper } as any)[SIGNAL] as any).dirty,
-    );
-
     this.name.set('Harry');
-
-    console.log('After setting firstName');
-    console.log('fullName dirty', (({ ...this.fullName } as any)[SIGNAL] as any).dirty);
-    console.log(
-      'fullNameWrapper dirty',
-      (({ ...this.fullNameWrapper } as any)[SIGNAL] as any).dirty,
-    );
 
     this.surname.set('Potter');
     queueMicrotask(() => console.log('Microtask after'));

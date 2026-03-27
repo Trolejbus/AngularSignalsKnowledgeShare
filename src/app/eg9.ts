@@ -31,14 +31,14 @@ export class Eg9 {
     age: 35,
   });
 
-  displayedComputed = computed(() => {
-    this.displayedComputedTriggered$.next(this.displayedComputedTriggered$.value + 1);
-    return `Human said: ${this.characterName()}`;
-  });
-
   characterName = computed(() => {
     this.computedCharacterNameTriggered$.next(this.computedCharacterNameTriggered$.value + 1);
     return `My name is ${this.character().name}`;
+  });
+
+  displayedComputed = computed(() => {
+    this.displayedComputedTriggered$.next(this.displayedComputedTriggered$.value + 1);
+    return `Human said: ${this.characterName()}`;
   });
 
   updateName(name: string): void {
